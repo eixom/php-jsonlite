@@ -149,7 +149,7 @@ class JsonliteEncoder {
 	}
 
 	private function isValueKeyword($value) {
-		return in_array($value, array(
+		return strlen($value) < 6 && in_array(strtolower($value), array(
 			'null', 'true', 'false'
 		));
 	}
@@ -158,7 +158,7 @@ class JsonliteEncoder {
 		/**
 		 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#Keywords
 		 */
-		return in_array($value, array(
+		return strlen($value) < 11 && in_array(strtolower($value), array(
 			'null', 'true', 'false', 'break', 'case',
 			'class', 'catch', 'const', 'continue',
 			'debugger', 'default', 'delete', 'do',
