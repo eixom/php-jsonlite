@@ -13,66 +13,48 @@ JSONLite 是 JSON 的简化版。减少字符输出的同时，仍保持数据�
 * 较为精确的错误位置和信息提示。
 * 解析时更为显性的暴漏格式错误
 
+
 ## 实例
-### 输出
-<table>
-    <tr>
-        <td>JSON</td>
-    </tr>
-    <tr>
-        <td>{"k":"v v","k1":{"k1":"ka"},"k2":{"k":"v v","k:":"v}","null":"v{","new":"false","1":null,"":"","n":1,"sn":"2"}}</td>
-    </tr>
-    <tr>
-       <td>JSONLite Js兼容模式</td>
-    </tr>
-    <tr>
-       <td>{k:"v v",k1:{k1:"ka"},k2:{k:"v v","k:":"v}","null":"v{","new":"false","1":null,"":"",n:1,sn:"2"}}</td>
-    </tr>
 
-    <tr>
-       <td>JSONLite Strict强类型模式</td>
-    </tr>
-    <tr>
-       <td>{k:v v,k1:{k1:ka},k2:{k:v v,"k:":"v}","null":"v{",new:"false",1:null,:,n:1,sn:"2"}}</td>
-    </tr>
+```php
+require_once 'jsonlite.php';
+$value = array(
+	'code'   => '123',
+	'msg'    => 'true str',
+	'null'   => null,
+	'new'    => '',
+	'double' => 1.0,
+);
+// 序列化
+// Js兼容模式
+$encoder = new JsonliteEncoder($value);
+echo $encoder->encode(), PHP_EOL;
+// {code:"123",msg:"true str","null":null,"new":"",double:1}
 
-    <tr>
-       <td>JSONLite Min最小化模式</td>
-    </tr>
-    <tr>
-       <td>{k:v v,k1:{k1:ka},k2:{k:v v,"k:":"v}","null":"v{",new:"false",1:null,:,n:1,sn:2}}</td>
-    </tr>
-</table>
+// Strict强类型模式
+$encoder = new JsonliteEncoder($value, JsonliteEncoder::TYPE_STRICT);
+echo $encoder->encode(), PHP_EOL;
+// {code:"123",msg:true str,"null":null,new:,double:1.0}
 
-<table>
-    <tr>
-        <td>JSON</td>
-    </tr>
-    <tr>
-        <td>["",1,2,"",["",1,2,"null test",null,"null","","new",""],"null test",null,"null","","new",""]</td>
-    </tr>
-    <tr>
-       <td>JSONLite Js兼容模式</td>
-    </tr>
-    <tr>
-       <td>["",1,2,"",["",1,2,"null test",null,"null","","new",""],"null test",null,"null","","new",""]</td>
-    </tr>
+// Min最小化模式
+$encoder = new JsonliteEncoder($value, JsonliteEncoder::TYPE_MIN);
+echo $encoder->encode(), PHP_EOL;
+// {code:123,msg:true str,"null":null,new:,double:1}
 
-    <tr>
-       <td>JSONLite Strict强类型模式</td>
-    </tr>
-    <tr>
-       <td>[,1.0,2,,[,1.0,2,null test,null,"null",,new,],null test,null,"null",,new,]</td>
-    </tr>
-
-    <tr>
-       <td>JSONLite Min最小化模式</td>
-    </tr>
-    <tr>
-       <td>[,1,2,,[,1,2,null test,null,"null",,new,],null test,null,"null",,new,]</td>
-    </tr>
-</table>
-
+// 解序列
+$jsonlite = '{code:123,msg:true str,"null":null,new:,double:1}';
+$encoder = new JsonliteDecoder($jsonlite);
+var_export($encoder->decode());
+/**
+ * array (
+ *     'code' => 123,
+ *     'msg' => 'true str',
+ *     'null' => NULL,
+ *     'new' => '',
+ *     'double' => 1,
+ * )
+ */
+```
 ### 体积对比
 根据测试数据计算，实际情况请另行估算。
 <table>
@@ -91,7 +73,6 @@ JSONLite 是 JSON 的简化版。减少字符输出的同时，仍保持数据�
     <tr><td>map_min</td><td>111</td><td>81</td><td>-30</td><td>27.03%</td></tr>
 </table>
 
-
 ## 版本信息
 
 * 最后更新：2014-10-07
@@ -101,7 +82,6 @@ JSONLite 是 JSON 的简化版。减少字符输出的同时，仍保持数据�
 ## 下载
 
 目前仅提供PHP版，请直接进入 php/ 目录进行下载。
-
 
 ## 联系作者
 
