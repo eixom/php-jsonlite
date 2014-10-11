@@ -426,8 +426,11 @@ class JsonliteDecoder {
 		if (!$pass) {
 			$this->rollback();
 		}
+		if (!$value || $value[0] !== '0') {
+			$value = $value + 0;
+		}
 
-		return array($pass, $value + 0);
+		return array($pass, $value);
 	}
 
 

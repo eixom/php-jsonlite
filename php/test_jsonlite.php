@@ -91,6 +91,15 @@ $value = '123';
 $encoder = new JsonliteEncoder($value);
 assert($encoder->encode() === '"123"', 'incorrect:numeric string');
 
+
+$value = '0123';
+$encoder = new JsonliteEncoder($value);
+assert($encoder->encode() === '"0123"', 'incorrect:numeric string');
+
+$encoder = new JsonliteEncoder($value, JsonliteEncoder::TYPE_MIN);
+assert($encoder->encode() === '0123', 'incorrect:numeric string');
+
+
 $value = '';
 $encoder = new JsonliteEncoder($value);
 assert($encoder->encode() === '""', 'incorrect_js:empty string');
@@ -355,6 +364,14 @@ $traces = $decoder->getTrace(true);
 assert(empty($traces), __LINE__);
 assert($result == $value, 'incorrect_decode_strict:numeric string');
 
+$value = '0123';
+$jsonlite = jsonlite_encode($value, JSONLITE_TYPE_STRICT);
+$decoder = new JsonliteDecoder($jsonlite);
+$result = $decoder->decode();
+$traces = $decoder->getTrace(true);
+assert(empty($traces), __LINE__);
+assert($result == $value, 'incorrect_decode_strict:numeric string');
+
 $value = '';
 $jsonlite = jsonlite_encode($value, JSONLITE_TYPE_STRICT);
 $decoder = new JsonliteDecoder($jsonlite);
@@ -498,6 +515,9 @@ $value->k2 = array(
 	''        => '',
 	'n'       => 1,
 	'sn'      => '2',
+	'zh-cn'   => '中文',
+	'0pre'    => '0123',
+	'0sub'    => '1230',
 );
 
 $jsonlite = jsonlite_encode($value);
