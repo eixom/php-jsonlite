@@ -19,6 +19,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 'on');
 require_once 'jsonlite.php';
 
+
 /**
  * encode
  */
@@ -469,6 +470,16 @@ $result = $decoder->decode();
 $traces = $decoder->getTrace(true);
 assert(empty($traces), __LINE__);
 assert($result === $value, 'incorrect_decode_min: only empty string in array');
+
+
+date_default_timezone_set('asia/shanghai');
+$value = array('date:' => date('Y-m-d H:i:s'));
+$jsonlite = jsonlite_encode($value, JSONLITE_TYPE_MIN);
+$decoder = new JsonliteDecoder($jsonlite);
+$result = $decoder->decode();
+$traces = $decoder->getTrace(true);
+assert(empty($traces), __LINE__);
+assert($result == $value, 'incorrect_decode_strict:complex array');
 
 
 $value = array('', 1.0, 2, '', array('', 1.0, 2, 'null test', null, 'null', '', 'new', ''), 'null test', null, 'null', '', 'new', '');

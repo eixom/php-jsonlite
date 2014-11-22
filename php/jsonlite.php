@@ -51,6 +51,7 @@ class JsonliteEncoder {
 	const  TYPE_STRICT = 3;
 
 	const DEPTH_MAX = 512;
+
 	private $depth;
 
 	/**
@@ -171,7 +172,7 @@ class JsonliteEncoder {
 	}
 
 	private function isKey($value) {
-		return preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/', $value);
+		return preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $value);
 	}
 
 	private function  appendString($str, $isKey = false) {
@@ -633,7 +634,7 @@ class JsonliteDecoder {
 			$sep = false;
 
 			if ($isKey) {
-				list($pass, $key) = $this->parseString(':,');
+				list($pass, $key) = $this->parseString(':');
 
 				if (!$pass) {
 					break;
@@ -641,8 +642,7 @@ class JsonliteDecoder {
 			} else {
 				$isKey = true;
 				if ($item === null) {
-					list($pass, $item) = $this->parse(',:');
-
+					list($pass, $item) = $this->parse(',');
 					if (!$pass) {
 						break;
 					}
@@ -814,3 +814,4 @@ function jsonlite_get_trace($detail = false) {
 	return $trace;
 }
 
+?>
