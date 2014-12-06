@@ -18,8 +18,9 @@
 
 /**
  * jsonlite
+ * just like json but more lighter
  */
-class JsonliteEncoder {
+class JSONLiteEncoder {
 	/**
 	 * @var mixed
 	 */
@@ -51,33 +52,92 @@ class JsonliteEncoder {
 	const  TYPE_STRICT = 3;
 
 	const DEPTH_MAX = 512;
-
+	/**
+	 * @var int
+	 */
 	private $depth;
 
 	/**
 	 * @param int
 	 */
-	private $type = self::TYPE_JS;
+	private $type;
+	/**
+	 * @var bool
+	 */
+	private $castAsMap;
 
+	/**
+	 *
+	 * @param mixed $value data
+	 * @param int $type work with log/js/strong type
+	 */
 	function __construct($value, $type = self::TYPE_JS) {
 		$this->value = $value;
 		$this->json = null;
 		$this->type = $type;
 		$this->depth = 0;
+		$this->castAsMap = false;
 	}
 
+	/**
+	 * @param boolean $castAsMap
+	 */
+	public function setCastAsMap($cast = true) {
+		$this->castAsMap = $cast;
+	}
+
+	/**
+	 * encode null
+	 */
 	private function  appendNull() {
-		$this->json .= 'null';
+		switch ($this->type) {
+			case self::TYPE_MIN:
+				$this->json .= '';
+				break;
+			case self::TYPE_JS:
+				$this->json .= '0';
+				break;
+			case self::TYPE_STRICT:
+			default:
+				$this->json .= 'null';
+		}
 	}
 
+	/**
+	 * encode bool
+	 *
+	 * @param $value
+	 */
 	private function  appendBool($value) {
-		$this->json .= $value ? 'true' : 'false';
+
+		switch ($this->type) {
+			case self::TYPE_MIN:
+				$this->json .= $value ? '1' : '';
+				break;
+			case self::TYPE_JS:
+				$this->json .= $value ? '1' : '0';
+				break;
+			case self::TYPE_STRICT:
+			default:
+				$this->json .= $value ? 'true' : 'false';
+		}
+
 	}
 
+	/**
+	 * encode int
+	 *
+	 * @param $value
+	 */
 	private function  appendInt($value) {
 		$this->json .= $value;
 	}
 
+	/**
+	 * encode float
+	 *
+	 * @param $value
+	 */
 	private function  appendFloat($value) {
 		$value = sprintf('%0.9g', $value);
 		if ($this->type === self::TYPE_STRICT) {
@@ -88,6 +148,12 @@ class JsonliteEncoder {
 		$this->json .= $value;
 	}
 
+	/**
+	 * encode array/map
+	 *
+	 * @param $array
+	 * @param $depth
+	 */
 	private function  appendArray($array, $depth) {
 		$i = 0;
 		$this->json .= '[';
@@ -107,11 +173,18 @@ class JsonliteEncoder {
 			$i++;
 		}
 
-		if ($this->type !== self::TYPE_JS && $i === 1 && $value === '') {
-			$this->json .= '""]';
-		} else {
-			$this->json .= ']';
+		if ($i === 1) {
+			if ($this->type !== self::TYPE_JS && $value === '') {
+				$this->json .= '""';
+			}
+
+			if ($this->type === self::TYPE_MIN && $value === null) {
+				$this->json .= '""';
+			}
 		}
+
+		$this->json .= ']';
+
 	}
 
 	private function  appendMap($map, $depth) {
@@ -135,7 +208,12 @@ class JsonliteEncoder {
 		$this->json .= '}';
 	}
 
-
+	/**
+	 * is map or array
+	 *
+	 * @param $array
+	 * @return bool
+	 */
 	private function  isAssoc($array) {
 		$i = 0;
 		$isAssoc = false;
@@ -144,6 +222,9 @@ class JsonliteEncoder {
 				$isAssoc = true;
 			}
 			$i++;
+		}
+		if ($i == 0) {
+			$isAssoc = $this->castAsMap;
 		}
 
 		return $isAssoc;
@@ -171,26 +252,145 @@ class JsonliteEncoder {
 		));
 	}
 
-	private function isKey($value) {
-		return preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $value);
+	private function isKey($str) {
+		$isKey = 0;
+		$len = strlen($str);
+		do {
+			if ($len < 1) {
+				break;
+			}
+			$isKey = 1;
+
+			for ($i = 0; $i < $len; $i++) {
+				$char = $str[$i];
+
+				if ($i == 0) {
+					if (!ctype_alpha($char) && $char !== '_') {
+						$isKey = 0;
+						break;
+					}
+					continue;
+				}
+				if (!ctype_alnum($char) && $char !== '_') {
+					$isKey = 0;
+					break;
+				}
+			}
+
+		} while (0);
+
+		return $isKey;
 	}
 
-	private function  appendString($str, $isKey = false) {
+	/**
+	 * finds whether or not to quote
+	 *
+	 * @param string $str string data
+	 * @param bool $isMapKey is map key
+	 * @return bool
+	 */
+	private function isQuote($str, $isMapKey = false) {
 		$isQuote = false;
-		if (strpos($str, ',') !== false
-			|| strpos($str, '[') !== false
-			|| strpos($str, ']') !== false
-			|| strpos($str, '{') !== false
-			|| strpos($str, '}') !== false
-			|| ($isKey && strpos($str, ':') !== false)
-			|| $this->isValueKeyword($str) // true false null
-			|| ($this->type === self::TYPE_JS && $this->isKeyword($str)) // function new with
-			|| ($isKey && $this->type === self::TYPE_JS && !$this->isKey($str))
-			|| (!$isKey && $this->type === self::TYPE_JS)
-			|| (!$isKey && $this->type === self::TYPE_STRICT && is_numeric($str))
-		) {
-			$isQuote = true;
-		}
+		do {
+			/**
+			 * special character
+			 */
+			if (strpbrk($str, ',[]{}') !== false) {
+				$isQuote = true;
+				break;
+			}
+			/**
+			 * array('key:' => value);
+			 */
+			if ($isMapKey && strpos($str, ':') !== false) {
+				$isQuote = true;
+				break;
+			}
+			/**
+			 * 'value' keyword
+			 * true false null
+			 */
+			if ($this->isValueKeyword($str)) {
+				$isQuote = true;
+				break;
+			}
+
+			if ($this->type === self::TYPE_JS) {
+				if ($this->isKeyword($str)) {
+					$isQuote = true;
+					break;
+				}
+
+				if ($isMapKey) {
+					if ($str === '') {
+						$isQuote = true;
+						break;
+					}
+
+					if (strpos($str, ':') !== false) {
+						$isQuote = true;
+						break;
+					}
+
+					if (!$this->isKey($str) && !is_numeric($str)) {
+						$isQuote = true;
+						break;
+					}
+				} else {
+					/**
+					 * 0 0
+					 * 0.1 0.1
+					 * 01 "01"
+					 * 00 "00"
+					 */
+					if (!is_numeric($str)) {
+						$isQuote = true;
+						break;
+					}
+
+					if (strpos($str, '.') === false && $str[0] === '0') {
+						$isQuote = true;
+						break;
+					}
+				}
+
+			}
+
+			if ($this->type === self::TYPE_STRICT) {
+				if (!$isMapKey) {
+					/**
+					 * 0 "0"
+					 * 0.1 "0.1"
+					 * 01 01
+					 * 00 00
+					 */
+					if (is_numeric($str)) {
+						$isQuote = true;
+
+						if (strpos($str, '.') === false) {
+							if ($str[0] === '0') {
+								$isQuote = false;
+							}
+						}
+						break;
+					}
+				}
+
+			}
+
+		} while (false);
+
+		return $isQuote;
+	}
+
+	/**
+	 * encode string
+	 *
+	 * @param string $str
+	 * @param bool $isMapKey is map key
+	 */
+	private function  appendString($str, $isMapKey = false) {
+		$isQuote = $this->isQuote($str, $isMapKey);
 
 		$literal = null;
 		if ($isQuote) {
@@ -237,6 +437,12 @@ class JsonliteEncoder {
 		$this->json .= $literal;
 	}
 
+	/**
+	 * encode mixed data
+	 *
+	 * @param $value
+	 * @param $depth
+	 */
 	private function append($value, $depth) {
 		if ($depth >= self::DEPTH_MAX) {
 			$this->mayRecursion();
@@ -287,10 +493,17 @@ class JsonliteEncoder {
 		} while (false);
 	}
 
+	/**
+	 * trigger an 'recursion' error
+	 */
 	private function mayRecursion() {
 		trigger_error('may.recursion', E_USER_WARNING);
 	}
 
+	/**
+	 * encode data
+	 * @return string/null jsonlite,return NULL on error
+	 */
 	public function encode() {
 		$this->append($this->value, 0);
 
@@ -300,14 +513,38 @@ class JsonliteEncoder {
 
 }
 
-class JsonliteDecoder {
+/**
+ * decode a JSONLite String
+ */
+class JSONLiteDecoder {
+	/**
+	 * @var string jsonlite string
+	 */
 	private $jsonlite;
+	/**
+	 * @var int offset
+	 */
 	private $index;
+	/**
+	 * @var int jsonlite string length
+	 */
 	private $length;
+	/**
+	 * @var int transaction start index
+	 */
 	private $transactionIndex;
+	/**
+	 * @var array error trace
+	 */
 	private $trace;
+	/**
+	 * @var array brackets stack
+	 */
 	private $stack;
 
+	/**
+	 * @param string $jsonlite jsonlite string
+	 */
 	function __construct($jsonlite) {
 		$this->jsonlite = $jsonlite;
 		$this->index = 0;
@@ -317,15 +554,26 @@ class JsonliteDecoder {
 		$this->stack = array();
 	}
 
-
+	/**
+	 * start a parse transaction
+	 */
 	private function begin() {
 		$this->transactionIndex = $this->index;
 	}
 
+	/**
+	 * rollback a parse transaction
+	 */
 	private function rollback() {
 		$this->index = $this->transactionIndex;
 	}
 
+	/**
+	 * log an error
+	 *
+	 * @param $msg error message
+	 * @param string $detail error detail
+	 */
 	private function trace($msg, $detail = null) {
 		$trace = array($msg, $this->transactionIndex, $this->index);
 		if ($detail) {
@@ -334,6 +582,12 @@ class JsonliteDecoder {
 		$this->trace[] = $trace;
 	}
 
+	/**
+	 * get errors
+	 *
+	 * @param bool $detail return detail description of error
+	 * @return array errors
+	 */
 	public function getTrace($detail = false) {
 		$traces = $this->trace;
 		if ($detail) {
@@ -353,7 +607,13 @@ class JsonliteDecoder {
 		return $traces;
 	}
 
-
+	/**
+	 * decode null,false/true
+	 *
+	 * @param $const lower case const
+	 * @param $boundary boundary characters
+	 * @return bool as expect or not
+	 */
 	private function parseConst($const, $boundary) {
 		$this->begin();
 		$pass = true;
@@ -390,23 +650,38 @@ class JsonliteDecoder {
 		return $pass;
 	}
 
-
+	/**
+	 * decode number
+	 *
+	 * @param $boundary boundary characters
+	 * @return array pass, value
+	 */
 	private function parseNumber($boundary) {
 		$this->begin();
 		$pass = false;
 		$value = null;
+		$dotCount = 0;
 		if ($this->jsonlite[$this->index] === '+') {
 			$this->index++;
 		} else if ($this->jsonlite[$this->index] == '-') {
 			$this->index++;
 			$value = '-';
 		}
-
+		$charDot = ord('.');
+		$charZero = ord('0');
+		$charNine = ord('9');
 		for (; $this->index < $this->length; $this->index++) {
 			$char = $this->jsonlite[$this->index];
 			$byte = ord($char);
+			if ($byte === $charDot) {
+				$dotCount++;
+				if ($dotCount > 1) {
+					$pass = false;
+					break;
+				}
+			}
 
-			if (ord('0') <= $byte && $byte <= ord('9') || $char === '.') {
+			if ($charZero <= $byte && $byte <= $charNine || $byte === $charDot) {
 				$value .= $char;
 				$pass = true;
 				continue;
@@ -424,17 +699,45 @@ class JsonliteDecoder {
 			break;
 		}
 
-		if (!$pass) {
-			$this->rollback();
+		if (!is_numeric($value)) {
+			$pass = false;
 		}
-		if (!$value || $value[0] !== '0') {
-			$value = $value + 0;
+		if ($pass) {
+			do {
+				if ($dotCount) {
+					$value = (double)$value;
+					break;
+				}
+
+				/**
+				 * 0 number
+				 * 0.1 number
+				 * 01 string
+				 * 00 string
+				 */
+				if ($value === '0' || $value[0] !== '0') {
+					$value = (int)$value;
+					break;
+				}
+
+				$pass = false;
+			} while (0);
+		}
+
+		if (!$pass) {
+			$value = null;
+			$this->rollback();
 		}
 
 		return array($pass, $value);
 	}
 
-
+	/**
+	 * decode string
+	 *
+	 * @param string $boundary boundary characters
+	 * @return array pass, value
+	 */
 	private function parseString($boundary = null) {
 		$this->begin();
 		$pass = false;
@@ -531,7 +834,11 @@ class JsonliteDecoder {
 		return array($pass, $value);
 	}
 
-
+	/**
+	 * decode list
+	 *
+	 * @return array pass,value
+	 */
 	private function parseList() {
 		$this->begin();
 		$pass = true;
@@ -545,9 +852,9 @@ class JsonliteDecoder {
 		for (; $this->index < $this->length; $this->index++) {
 			$char = $this->jsonlite[$this->index];
 
-			if ($sep && $char === ',') {
+			if (($sep === ',' || $sep === '[') && $char === ',') {
 				$value[] = '';
-				$sep = null;
+				$sep = ',';
 				continue;
 			}
 
@@ -556,16 +863,16 @@ class JsonliteDecoder {
 				continue;
 			}
 
-			if ($sep == ',' && $char == ']') {
-				$value[] = '';
-				$sep = null;
-			}
-
-			if ($char == ']') {
+			if ($char === ']') {
+				if ($sep === ',') {
+					$value[] = '';
+				}
 				break;
 			}
+
 			$sep = false;
 			list($pass, $item) = $this->parse(',');
+
 			if ($pass) {
 				$value[] = $item;
 			}
@@ -585,6 +892,11 @@ class JsonliteDecoder {
 		return array($pass, $value);
 	}
 
+	/**
+	 * decode map/object/associative array
+	 *
+	 * @return array
+	 */
 	private function parseMap() {
 		$this->begin();
 		$pass = true;
@@ -600,7 +912,10 @@ class JsonliteDecoder {
 
 		for (; $this->index < $this->length; $this->index++) {
 			$char = $this->jsonlite[$this->index];
-
+			/**
+			 * {:123}
+			 * {key:value,:123}
+			 */
 			if ($char === ':') {
 				$isKey = false;
 				if ($sep) {
@@ -611,7 +926,9 @@ class JsonliteDecoder {
 				}
 				continue;
 			}
-
+			/**
+			 * {key:,key2:value}
+			 */
 			if ($char === ',') {
 				if ($sep === ':') {
 					$sep = ',';
@@ -621,7 +938,9 @@ class JsonliteDecoder {
 					continue;
 				}
 			}
-
+			/**
+			 * {key:}
+			 */
 			if ($char === '}') {
 				if ($sep === ':') {
 					$item = '';
@@ -631,11 +950,10 @@ class JsonliteDecoder {
 				}
 			}
 
-			$sep = false;
 
 			if ($isKey) {
 				list($pass, $key) = $this->parseString(':');
-
+				$sep = null;
 				if (!$pass) {
 					break;
 				}
@@ -643,6 +961,7 @@ class JsonliteDecoder {
 				$isKey = true;
 				if ($item === null) {
 					list($pass, $item) = $this->parse(',');
+					$sep = null;
 					if (!$pass) {
 						break;
 					}
@@ -672,6 +991,12 @@ class JsonliteDecoder {
 		return array($pass, $value);
 	}
 
+	/**
+	 * parse mixed value
+	 *
+	 * @param string $boundary boundary characters
+	 * @return array pass,value
+	 */
 	private function parse($boundary = null) {
 		$pass = false;
 		$value = null;
@@ -757,6 +1082,11 @@ class JsonliteDecoder {
 		return array($pass, $value);
 	}
 
+	/**
+	 * decode
+	 *
+	 * @return mixed
+	 */
 	public function decode() {
 		list($pass, $value) = $this->parse();
 		if ($this->stack) {
@@ -769,18 +1099,28 @@ class JsonliteDecoder {
 }
 
 define('JSONLITE_TRACE_G', '__jsonlite_trace_g');
+/**
+ * work with log
+ */
 define('JSONLITE_TYPE_MIN', JsonliteEncoder::TYPE_MIN);
+/**
+ * work with js
+ */
 define('JSONLITE_TYPE_JS', JsonliteEncoder::TYPE_JS);
+/**
+ * work with strong type program language
+ */
 define('JSONLITE_TYPE_STRICT', JsonliteEncoder::TYPE_STRICT);
 /**
- * get the jsonlite of a value
+ * get the JSONLite representation of a value
  *
  * @param mixed $value
  * @param int $type
  * @return string
  */
-function jsonlite_encode($value, $type = JSONLITE_TYPE_JS) {
-	$encoder = new JsonliteEncoder($value, $type);
+function jsonlite_encode($value, $type = JSONLITE_TYPE_JS, $castAsMap = false) {
+	$encoder = new JSONLiteEncoder($value, $type);
+	$encoder->setCastAsMap($castAsMap);
 
 	return $encoder->encode();
 }
@@ -793,7 +1133,7 @@ function jsonlite_encode($value, $type = JSONLITE_TYPE_JS) {
  */
 function jsonlite_decode($jsonlite, $trace = false) {
 	unset($GLOBALS[JSONLITE_TRACE_G]);
-	$decoder = new JsonliteDecoder($jsonlite);
+	$decoder = new JSONLiteDecoder($jsonlite);
 	if ($trace) {
 		$GLOBALS[JSONLITE_TRACE_G] = $decoder;
 	}
@@ -801,6 +1141,12 @@ function jsonlite_decode($jsonlite, $trace = false) {
 	return $decoder->decode();
 }
 
+/**
+ * get errors
+ *
+ * @param bool $detail return detail description of error
+ * @return array
+ */
 function jsonlite_get_trace($detail = false) {
 	/**
 	 * @var $decoder JsonliteDecoder

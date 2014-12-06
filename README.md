@@ -27,23 +27,23 @@ $value = array(
 );
 // 序列化
 // Js兼容模式
-$encoder = new JsonliteEncoder($value);
+$encoder = new JSONLiteEncoder($value);
 echo $encoder->encode(), PHP_EOL;
 // {code:"123",msg:"true str","null":null,"new":"",double:1}
 
 // Strict强类型模式
-$encoder = new JsonliteEncoder($value, JsonliteEncoder::TYPE_STRICT);
+$encoder = new JSONLiteEncoder($value, JSONLiteEncoder::TYPE_STRICT);
 echo $encoder->encode(), PHP_EOL;
 // {code:"123",msg:true str,"null":null,new:,double:1.0}
 
 // Min最小化模式
-$encoder = new JsonliteEncoder($value, JsonliteEncoder::TYPE_MIN);
+$encoder = new JSONLiteEncoder($value, JSONLiteEncoder::TYPE_MIN);
 echo $encoder->encode(), PHP_EOL;
 // {code:123,msg:true str,"null":null,new:,double:1}
 
 // 解序列
 $jsonlite = '{code:123,msg:true str,"null":null,new:,double:1}';
-$encoder = new JsonliteDecoder($jsonlite);
+$encoder = new JSONLiteDecoder($jsonlite);
 var_export($encoder->decode());
 /**
  * array (
