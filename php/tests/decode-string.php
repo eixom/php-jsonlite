@@ -31,6 +31,12 @@ assert_decode_result($value, '00', '00', '00');
 $value = '0.123';
 assert_decode_result($value, 0.123, 0.123, '0.123');
 
+$value = "\\|\b|\f|\n|\r|\t|\"";
+assert_decode_result($value,
+	"\\|\b|\f|\n|\r|\t|\"",
+	"\\|\b|\f|\n|\r|\t|\"",
+	"\\|\b|\f|\n|\r|\t|\""
+);
 
 $value = '';
 assert_decode_result($value, '', '', '');

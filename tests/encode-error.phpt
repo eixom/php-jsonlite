@@ -1,3 +1,6 @@
+--TEST--
+check encoding: error
+--FILE--
 <?php
 require_once dirname(__FILE__) . '/helper.php';
 
@@ -26,3 +29,6 @@ restore_error_handler();
 
 
 echo '[success] error';
+?>
+--EXPECT--
+[success] error

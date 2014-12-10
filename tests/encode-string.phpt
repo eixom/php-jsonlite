@@ -1,3 +1,6 @@
+--TEST--
+check encoding: string
+--FILE--
 <?php
 require_once dirname(__FILE__) . '/helper.php';
 
@@ -52,3 +55,6 @@ assert_encode_result($value, '中文', '"中文"', '中文');
 
 
 echo '[success] string';
+?>
+--EXPECT--
+[success] string

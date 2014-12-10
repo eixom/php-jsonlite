@@ -21,18 +21,22 @@
  * just like json but more lighter
  */
 class JSONLiteEncoder {
+
 	/**
 	 * @var mixed
 	 */
 	private $value;
+
 	/**
 	 * @var int
 	 */
 	private $code;
+
 	/**
 	 * @var string
 	 */
 	private $msg;
+
 	/**
 	 * @var string
 	 */
@@ -42,16 +46,19 @@ class JSONLiteEncoder {
 	 * minimum
 	 */
 	const  TYPE_MIN = 1;
+
 	/**
 	 * work with js
 	 */
 	const  TYPE_JS = 2;
+
 	/**
 	 * strong type
 	 */
 	const  TYPE_STRICT = 3;
 
 	const DEPTH_MAX = 512;
+
 	/**
 	 * @var int
 	 */
@@ -61,6 +68,7 @@ class JSONLiteEncoder {
 	 * @param int
 	 */
 	private $type;
+
 	/**
 	 * @var bool
 	 */
@@ -149,6 +157,30 @@ class JSONLiteEncoder {
 	}
 
 	/**
+	 * is map or array
+	 *
+	 * @param $array
+	 * @return bool
+	 */
+	private function  isAssoc($array) {
+		$i = 0;
+		$isAssoc = false;
+		foreach ($array as $key => $value) {
+			if ($key !== $i) {
+				$isAssoc = true;
+				break;
+			}
+			$i++;
+		}
+		if (!$isAssoc && $i == 0) {
+			$isAssoc = $this->castAsMap;
+		}
+
+		return $isAssoc;
+	}
+
+
+	/**
 	 * encode array/map
 	 *
 	 * @param $array
@@ -208,34 +240,25 @@ class JSONLiteEncoder {
 		$this->json .= '}';
 	}
 
+
 	/**
-	 * is map or array
+	 * is value keyword
 	 *
-	 * @param $array
+	 * @param $value
 	 * @return bool
 	 */
-	private function  isAssoc($array) {
-		$i = 0;
-		$isAssoc = false;
-		foreach ($array as $key => $value) {
-			if ($key !== $i) {
-				$isAssoc = true;
-			}
-			$i++;
-		}
-		if ($i == 0) {
-			$isAssoc = $this->castAsMap;
-		}
-
-		return $isAssoc;
-	}
-
 	private function isValueKeyword($value) {
 		return strlen($value) < 6 && in_array(strtolower($value), array(
 			'null', 'true', 'false'
 		));
 	}
 
+	/**
+	 * is keyword
+	 *
+	 * @param $value
+	 * @return bool
+	 */
 	private function isKeyword($value) {
 		/**
 		 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#Keywords
@@ -251,6 +274,13 @@ class JSONLiteEncoder {
 			'typeof', 'var', 'void', 'while', 'with', 'yield'
 		));
 	}
+
+	/**
+	 * match [a-zA-Z_][0-9a-zA-Z_]
+	 *
+	 * @param $str
+	 * @return int
+	 */
 
 	private function isKey($str) {
 		$isKey = 0;
@@ -405,25 +435,32 @@ class JSONLiteEncoder {
 			$char = $str[$i];
 			switch ($char) {
 				case '"':
-					$literal .= '\"';
+					if ($isQuote) {
+						$literal .= '\\"';
+					} else {
+						$literal .= '"';
+					}
 					break;
 				case '\\':
-					$literal .= '\\';
+					$literal .= '\\\\';
 					break;
+				/**
+				 * WARINING: "\b" expressed as "\" and "b"
+				 */
 				case "\b":
-					$literal .= '\b';
+					$literal .= '\\b';
 					break;
 				case "\f":
-					$literal .= '\f';
+					$literal .= '\\f';
 					break;
 				case "\n":
-					$literal .= '\n';
+					$literal .= '\\n';
 					break;
 				case "\r":
-					$literal .= '\r';
+					$literal .= '\\r';
 					break;
 				case "\t":
-					$literal .= '\t';
+					$literal .= '\\t';
 					break;
 				default:
 					$literal .= $char;
