@@ -57,7 +57,6 @@ function assert_encode_result($value, $expected_min, $expected_js, $expected_str
 }
 
 function assert_decode_result($value, $expected_min, $expected_js, $expected_strict) {
-	return;
 	/**
 	 * min
 	 */

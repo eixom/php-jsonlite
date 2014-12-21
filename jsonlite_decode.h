@@ -14,60 +14,41 @@
    +----------------------------------------------------------------------+
  */
 
-#ifndef PHP_JSONLITE_HELPER_H
-#define PHP_JSONLITE_HELPER_H
+
+
+#ifndef JSONLITE_DECODE_H
+#define JSONLITE_DECODE_H
 
 #include "php.h"
-#include "zend_exceptions.h"
-#include "php_jsonlite.h"
-#include "ctype.h"
 
 
-/** {{{ ze_error
-*/
-void jsonlite_error(int type TSRMLS_DC, const char *name, ...) {
-    va_list ap;
-    int len = 0;
-    char *buf = NULL;
-    char *msg = NULL;
+#define JSONLITE_PARSER_MAX_DEPTH 512
 
-    if (EG(exception)) {
-        zend_throw_exception_object(EG(exception)/**/TSRMLS_CC);
-        return;
-    }
+typedef struct {
+    char *jsonlite; // jsonlite string
+    uint index; // offset
+    uint length; // jsonlite string length
+    uint transactionIndex; // transaction start index
+    zval *trace; // error trace
+    char stack[JSONLITE_PARSER_MAX_DEPTH]; // brackets stack
+    int stack_index;
+} jsonlite_decoder;
 
-    va_start(ap, name);
-    len = vspprintf(&buf, 0, name, ap);
-    va_end(ap);
-    spprintf(&msg, 0, INI_STR("errors_doc_url"), buf);
+PHPAPI zend_bool php_jsonlite_decode(char *jsonlite, int jsonlite_len, zval **value,
+        jsonlite_decoder **decoder TSRMLS_DC);
 
-    php_error(type, "%s", msg);
-    efree(msg);
-    efree(buf);
-}
+PHPAPI void php_jsonlite_free(jsonlite_decoder *decoder TSRMLS_DC);
 
-/* }}} */
+PHP_FUNCTION (jsonlite_decode);
 
-zend_bool is_in_list(char **haystack, zend_uint size, const char *needle) {
-    zend_bool is_exists = 0;
-    int i = 0;
-    for (i = 0; i < size; i++) {
-        if (strcmp(needle, haystack[i]) == 0) {
-            is_exists = 1;
-            break;
-        }
-    }
-    return is_exists;
-}
+PHP_FUNCTION (jsonlite_get_trace);
 
-#endif /* ZE_HELPER_C */
-
-
+#endif
 /*
- * Local variables:
- * tab-width: 4
+ * Local Variables:
  * c-basic-offset: 4
+ * tab-width: 4
  * End:
- * vim600: noet sw=4 ts=4 fdm=marker
- * vim<600: noet sw=4 ts=4
+ * vim600: fdm=marker
+ * vim: noet sw=4 ts=4
  */

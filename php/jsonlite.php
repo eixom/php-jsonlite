@@ -630,10 +630,20 @@ class JSONLiteDecoder {
 		if ($detail) {
 
 			foreach ($traces as $key => $trace) {
+				$start = $trace[1];
+				$end = $trace[2];
+				if ($start > 0) {
+					$start--;
+				}
+
+				if ($end <= $this->length) {
+					$end++;
+				}
+
 				$traces[$key] = array(
 					'msg'   => $trace[0],
 					'range' => array($trace[1], $trace[2]),
-					'chars' => substr($this->jsonlite, $trace[1] - 1, $trace[2] + 1),
+					'chars' => substr($this->jsonlite, $start, $end - $start),
 				);
 				if (isset($trace[3])) {
 					$traces[$key]['detail'] = $trace[3];
@@ -718,7 +728,7 @@ class JSONLiteDecoder {
 				}
 			}
 
-			if ($charZero <= $byte && $byte <= $charNine || $byte === $charDot) {
+			if (($charZero <= $byte && $byte <= $charNine) || $byte === $charDot) {
 				$value .= $char;
 				$pass = true;
 				continue;
@@ -859,7 +869,7 @@ class JSONLiteDecoder {
 			$pass = true;
 		}
 
-		if (!$terminal && $this->index = $this->length) {
+		if (!$terminal && $this->index == $this->length) {
 			$pass = true;
 		}
 

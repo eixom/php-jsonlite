@@ -16,7 +16,7 @@
   +----------------------------------------------------------------------+
  */
 
-exit(__FILE__ . ':not for inclusion!');
+exit(__FILE__ . ':not for including!');
 
 /**
  * jsonlite encode
@@ -24,4 +24,5 @@ exit(__FILE__ . ':not for inclusion!');
  * @param mixed $value
  * @return string
  */
-function jsonlite_encode($value){}
+function jsonlite_encode($value) {
+}

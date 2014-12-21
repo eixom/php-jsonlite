@@ -1,3 +1,6 @@
+--TEST--
+check decoding: error
+--FILE--
 <?php
 require_once dirname(__FILE__) . '/helper.php';
 
@@ -7,10 +10,9 @@ require_once dirname(__FILE__) . '/helper.php';
  */
 
 $jsonlite = '{k:v]';
-$decoder = new JsonliteDecoder($jsonlite);
-$result = $decoder->decode();
-assert($result === null, __LINE__);
-$traces = $decoder->getTrace(true);
+$result = jsonlite_decode($jsonlite);
+assert($result === null);
+$traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(
 			'msg'   => 'map.terminal',
@@ -28,10 +30,9 @@ assert($traces === array(
 	), var_export($traces, true));
 
 $jsonlite = '[true';
-$decoder = new JsonliteDecoder($jsonlite);
-$result = $decoder->decode();
-assert($result === null, __LINE__);
-$traces = $decoder->getTrace(true);
+$result = jsonlite_decode($jsonlite);
+assert($result === null);
+$traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(
 			'msg'    => 'brackets.match',
@@ -43,10 +44,9 @@ assert($traces === array(
 	), var_export($traces, true));
 
 $jsonlite = ']';
-$decoder = new JsonliteDecoder($jsonlite);
-$result = $decoder->decode();
-assert($result === null, __LINE__);
-$traces = $decoder->getTrace(true);
+$result = jsonlite_decode($jsonlite);
+assert($result === null);
+$traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(
 			'msg'   => 'parse.char',
@@ -57,10 +57,9 @@ assert($traces === array(
 	), var_export($traces, true));
 
 $jsonlite = '[,';
-$decoder = new JsonliteDecoder($jsonlite);
-$result = $decoder->decode();
-assert($result === null, __LINE__);
-$traces = $decoder->getTrace(true);
+$result = jsonlite_decode($jsonlite);
+assert($result === null);
+$traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(
 			'msg'    => 'brackets.match',
@@ -73,9 +72,8 @@ assert($traces === array(
 
 
 $jsonlite = '[,';
-
-$result = jsonlite_decode($jsonlite, true);
-assert($result === null, __LINE__);
+$result = jsonlite_decode($jsonlite);
+assert($result === null);
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(
@@ -86,4 +84,9 @@ assert($traces === array(
 			'detail' => ']'
 		)
 	), var_export($traces, true));
+
+
 echo '[success] error';
+?>
+--EXPECT--
+[success] error

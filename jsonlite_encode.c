@@ -76,7 +76,7 @@ static void append_double(jsonlite_encoder *self, smart_str *buffer, double val 
     int len = 0;
 
     if (!zend_isinf(val) && !zend_isnan(val)) {
-        len = spprintf(&str, 0, "%.*H", (int) EG(precision), val);
+        len = spprintf(&str, 0, "%.*G", (int) EG(precision), val);
         smart_str_appendl(buffer, str, len);
 
         if (self->type == JSONLITE_TYPE_STRICT) {

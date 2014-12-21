@@ -23,16 +23,14 @@
 #endif
 
 #include "php.h"
-//#include "php_ini.h"
 #include "ext/standard/info.h"
 #include "php_jsonlite.h"
 #include "jsonlite_encode.h"
+#include "jsonlite_decode.h"
 
-/* If you declare any globals in php_jsonlite.h uncomment this:
-ZEND_DECLARE_MODULE_GLOBALS(jsonlite)
-*/
 
 /* True global resources - no need for thread safety here */
+
 static int le_jsonlite;
 
 /* {{{ jsonlite_functions[]
@@ -40,7 +38,9 @@ static int le_jsonlite;
  * Every user visible function must have an entry in jsonlite_functions[].
  */
 const zend_function_entry jsonlite_functions[] = {
-        PHP_FE(jsonlite_encode, NULL)        /* For testing, remove later. */
+        PHP_FE(jsonlite_encode, NULL)
+        PHP_FE(jsonlite_decode, NULL)
+        PHP_FE(jsonlite_get_trace, NULL)
         PHP_FE_END    /* Must be the last line in jsonlite_functions[] */
 };
 /* }}} */
@@ -59,7 +59,7 @@ zend_module_entry jsonlite_module_entry = {
         PHP_RSHUTDOWN(jsonlite),    /* Replace with NULL if there's nothing to do at request end */
         PHP_MINFO(jsonlite),
 #if ZEND_MODULE_API_NO >= 20010901
-        "0.1", /* Replace with version number for your extension */
+        PHP_JSONLITE_VERSION,
 #endif
         STANDARD_MODULE_PROPERTIES
 };
@@ -79,15 +79,13 @@ PHP_INI_END()
 */
 /* }}} */
 
+ZEND_DECLARE_MODULE_GLOBALS(jsonlite)
+
 /* {{{ php_jsonlite_init_globals
  */
-/* Uncomment this function if you have INI entries
-static void php_jsonlite_init_globals(zend_jsonlite_globals *jsonlite_globals)
-{
-	jsonlite_globals->global_value = 0;
-	jsonlite_globals->global_string = NULL;
+static void php_jsonlite_init_globals(zend_jsonlite_globals *jsonlite_globals) {
+    jsonlite_globals->decoder = 0;
 }
-*/
 /* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION
@@ -96,6 +94,7 @@ PHP_MINIT_FUNCTION (jsonlite) {
     /* If you have INI entries, uncomment these lines
     REGISTER_INI_ENTRIES();
     */
+    ZEND_INIT_MODULE_GLOBALS(jsonlite, php_jsonlite_init_globals, NULL);
     REGISTER_LONG_CONSTANT("JSONLITE_TYPE_MIN", JSONLITE_TYPE_MIN, CONST_CS | CONST_PERSISTENT);
     REGISTER_LONG_CONSTANT("JSONLITE_TYPE_JS", JSONLITE_TYPE_JS, CONST_CS | CONST_PERSISTENT);
     REGISTER_LONG_CONSTANT("JSONLITE_TYPE_STRICT", JSONLITE_TYPE_STRICT, CONST_CS | CONST_PERSISTENT);
@@ -125,6 +124,7 @@ PHP_RINIT_FUNCTION (jsonlite) {
 /* {{{ PHP_RSHUTDOWN_FUNCTION
  */
 PHP_RSHUTDOWN_FUNCTION (jsonlite) {
+    php_jsonlite_free(JSONLITE_G(decoder) /**/TSRMLS_CC);
     return SUCCESS;
 }
 /* }}} */
@@ -141,8 +141,6 @@ PHP_MINFO_FUNCTION (jsonlite) {
     */
 }
 /* }}} */
-
-
 
 /*
  * Local variables:

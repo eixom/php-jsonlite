@@ -16,7 +16,7 @@
   +----------------------------------------------------------------------+
  */
 
-exit(__FILE__ . ':not for inclusion!');
+exit(__FILE__ . ':not for including!');
 
 /**
  * jsonlite decode
@@ -24,4 +24,15 @@ exit(__FILE__ . ':not for inclusion!');
  * @param string $jsonlite
  * @return mixed
  */
-function jsonlite_decode($jsonlite){}
+function jsonlite_decode($jsonlite) {
+}
+
+
+/**
+ * get decode erros
+ *
+ * @param bool $detail more detail
+ * @return array
+ */
+function jsonlite_get_trace($detail = false) {
+}

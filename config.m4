@@ -10,8 +10,10 @@ if test "$PHP_JSONLITE" != "no"; then
 AC_DEFUN([PHP_JSONLITE_ADD_SOURCE], [
     PHP_JSONLITE_SOURCES="$PHP_JSONLITE_SOURCES $1"
 ])
-    PHP_JSONLITE_ADD_SOURCE([jsonlite.c helper.c])
+    PHP_JSONLITE_ADD_SOURCE([jsonlite.c])
+    PHP_JSONLITE_ADD_SOURCE([helper.c])
     PHP_JSONLITE_ADD_SOURCE([jsonlite_encode.c])
+    PHP_JSONLITE_ADD_SOURCE([jsonlite_decode.c])
 
     PHP_NEW_EXTENSION(jsonlite, $PHP_JSONLITE_SOURCES,$ext_shared)
 
