@@ -12,6 +12,13 @@ require_once dirname(__FILE__) . '/helper.php';
 $jsonlite = '{k:v]';
 $result = jsonlite_decode($jsonlite);
 assert($result === null);
+
+$traces = jsonlite_get_trace();
+assert($traces === array(
+		array('map.terminal', 3, 6,),
+		array('brackets.match', 3, 3, '}'),
+	), var_export($traces, true));
+
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(
@@ -32,6 +39,12 @@ assert($traces === array(
 $jsonlite = '[true';
 $result = jsonlite_decode($jsonlite);
 assert($result === null);
+
+$traces = jsonlite_get_trace();
+assert($traces === array(
+		array('brackets.match', 1, 1, ']'),
+	), var_export($traces, true));
+
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(
@@ -46,6 +59,12 @@ assert($traces === array(
 $jsonlite = ']';
 $result = jsonlite_decode($jsonlite);
 assert($result === null);
+
+$traces = jsonlite_get_trace();
+assert($traces === array(
+		array('parse.char', 0, 0),
+	), var_export($traces, true));
+
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(
@@ -59,6 +78,12 @@ assert($traces === array(
 $jsonlite = '[,';
 $result = jsonlite_decode($jsonlite);
 assert($result === null);
+
+$traces = jsonlite_get_trace();
+assert($traces === array(
+		array('brackets.match', 0, 0, ']'),
+	), var_export($traces, true));
+
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(
@@ -74,6 +99,12 @@ assert($traces === array(
 $jsonlite = '[,';
 $result = jsonlite_decode($jsonlite);
 assert($result === null);
+
+$traces = jsonlite_get_trace();
+assert($traces === array(
+		array('brackets.match', 0, 0, ']'),
+	), var_export($traces, true));
+
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
 		array(

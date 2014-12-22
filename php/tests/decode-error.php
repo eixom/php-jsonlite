@@ -9,7 +9,14 @@ require_once dirname(__FILE__) . '/helper.php';
 $jsonlite = '{k:v]';
 $decoder = new JsonliteDecoder($jsonlite);
 $result = $decoder->decode();
-assert($result === null, __LINE__);
+assert($result === null);
+
+$traces = $decoder->getTrace();
+assert($traces === array(
+		array('map.terminal', 3, 6,),
+		array('brackets.match', 3, 3, '}'),
+	), var_export($traces, true));
+
 $traces = $decoder->getTrace(true);
 assert($traces === array(
 		array(
@@ -30,7 +37,13 @@ assert($traces === array(
 $jsonlite = '[true';
 $decoder = new JsonliteDecoder($jsonlite);
 $result = $decoder->decode();
-assert($result === null, __LINE__);
+assert($result === null);
+
+$traces = $decoder->getTrace();
+assert($traces === array(
+		array('brackets.match', 1, 1, ']'),
+	), var_export($traces, true));
+
 $traces = $decoder->getTrace(true);
 assert($traces === array(
 		array(
@@ -45,7 +58,13 @@ assert($traces === array(
 $jsonlite = ']';
 $decoder = new JsonliteDecoder($jsonlite);
 $result = $decoder->decode();
-assert($result === null, __LINE__);
+assert($result === null);
+
+$traces = $decoder->getTrace();
+assert($traces === array(
+		array('parse.char', 0, 0),
+	), var_export($traces, true));
+
 $traces = $decoder->getTrace(true);
 assert($traces === array(
 		array(
@@ -59,7 +78,13 @@ assert($traces === array(
 $jsonlite = '[,';
 $decoder = new JsonliteDecoder($jsonlite);
 $result = $decoder->decode();
-assert($result === null, __LINE__);
+assert($result === null);
+
+$traces = $decoder->getTrace();
+assert($traces === array(
+		array('brackets.match', 0, 0, ']'),
+	), var_export($traces, true));
+
 $traces = $decoder->getTrace(true);
 assert($traces === array(
 		array(
@@ -75,8 +100,14 @@ assert($traces === array(
 $jsonlite = '[,';
 
 $result = jsonlite_decode($jsonlite, true);
-assert($result === null, __LINE__);
-$traces = jsonlite_get_trace(true);
+assert($result === null);
+
+$traces = $decoder->getTrace();
+assert($traces === array(
+		array('brackets.match', 0, 0, ']'),
+	), var_export($traces, true));
+
+$traces = $decoder->getTrace(true);
 assert($traces === array(
 		array(
 			'msg'    => 'brackets.match',

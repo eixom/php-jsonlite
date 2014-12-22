@@ -74,7 +74,8 @@ static void trace(jsonlite_decoder *self, const char *msg, const char *detail) {
 
 }
 
-static zval *get_trace(const jsonlite_decoder *self) {
+static zval *get_trace(jsonlite_decoder *self) {
+    zval_add_ref(&self->trace);
     return self->trace;
 }
 
@@ -825,11 +826,21 @@ PHP_FUNCTION (jsonlite_decode) {
    Reads a line */
 PHP_FUNCTION (jsonlite_get_trace) {
     zval *value = NULL;
+    zend_bool detail = 0;
     jsonlite_decoder *decoder = JSONLITE_G(decoder);
 
-    if (decoder != NULL) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS()TSRMLS_CC, "|b",
+            &detail
+    ) == FAILURE) {
+        WRONG_PARAM_COUNT;
+    }
 
-        value = get_trace_detail(decoder);
+    if (decoder != NULL) {
+        if (detail) {
+            value = get_trace_detail(decoder);
+        } else {
+            value = get_trace(decoder);
+        }
 
         RETURN_ZVAL(value, 0, 1);
     }
