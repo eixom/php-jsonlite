@@ -4,6 +4,8 @@ JSONLite 是 JSON 的简化版。减少字符输出的同时，仍保持数据�
 
 建议PHP版本 >= 5.2.0 。
 
+[![Build Status](https://secure.travis-ci.org/eixom/php-jsonlite.png)](http://travis-ci.org/eixom/php-jsonlite)
+
 ## 特性
 
 * Js 兼容模式，兼容Js语法。取消了不必要的双引号。
