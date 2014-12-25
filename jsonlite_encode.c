@@ -323,7 +323,6 @@ static zend_bool is_key(const char *value, const uint len) {
 
 static zend_bool is_quote(jsonlite_encoder *self, smart_str *buffer, char *str, int len, zend_bool is_map_key TSRMLS_DC) {
     zend_bool quote = 0;
-    quote = false;
     do {
         /**
         * special character
@@ -402,7 +401,7 @@ static zend_bool is_quote(jsonlite_encoder *self, smart_str *buffer, char *str, 
 
                     if (strchr(str, '.') == NULL) {
                         if (str[0] == '0') {
-                            quote = false;
+                            quote = 0;
                         }
                     }
                     break;
@@ -411,7 +410,7 @@ static zend_bool is_quote(jsonlite_encoder *self, smart_str *buffer, char *str, 
 
         }
 
-    } while (false);
+    } while (0);
 
     return quote;
 }

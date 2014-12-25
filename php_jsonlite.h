@@ -39,6 +39,10 @@ extern zend_module_entry jsonlite_module_entry;
 #	define PHP_JSONLITE_API
 #endif
 
+#ifndef PHP_FE_END
+#define PHP_FE_END {NULL, NULL, NULL}
+#endif PHP_FE_END
+
 #ifdef ZTS
 #include "TSRM.h"
 #endif
