@@ -25,23 +25,23 @@ $value = array(
 	'new'    => '',
 	'double' => 1.0,
 );
-// 序列化
-// Js兼容模式
+// serialize
+// js
 $encoder = new JSONLiteEncoder($value);
 echo $encoder->encode(), PHP_EOL;
 // {code:"123",msg:"true str","null":null,"new":"",double:1}
 
-// Strict强类型模式
+// strict
 $encoder = new JSONLiteEncoder($value, JSONLiteEncoder::TYPE_STRICT);
 echo $encoder->encode(), PHP_EOL;
 // {code:"123",msg:true str,"null":null,new:,double:1.0}
 
-// Min最小化模式
+// min
 $encoder = new JSONLiteEncoder($value, JSONLiteEncoder::TYPE_MIN);
 echo $encoder->encode(), PHP_EOL;
 // {code:123,msg:true str,"null":null,new:,double:1}
 
-// 解序列
+// unserialize
 $jsonlite = '{code:123,msg:true str,"null":null,new:,double:1}';
 $encoder = new JSONLiteDecoder($jsonlite);
 var_export($encoder->decode());
@@ -55,14 +55,14 @@ var_export($encoder->decode());
  * )
  */
 ```
-### 体积对比
-根据测试数据计算，实际情况请另行估算。
+### 尺寸比较
+
 <table>
     <tr>
         <td>模式</td>
-        <td>JSON</td>
-        <td>JSONLite</td>
-        <td>变化量</td>
+        <td>json</td>
+        <td>jsonlite</td>
+        <td>节约</td>
         <td>变化率</td>
     </tr>
     <tr><td>array_js</td><td>92</td><td>92</td><td>0</td><td> 0.00%</td></tr>
@@ -73,17 +73,26 @@ var_export($encoder->decode());
     <tr><td>map_min</td><td>111</td><td>81</td><td>-30</td><td>27.03%</td></tr>
 </table>
 
-## 版本信息
+## 版本
 
-* 最后更新：2014-10-07
-* 最新版本：0.1
+* 最后更新：2014-12-25
+* 最新版本： 0.2
 
     
-## 下载
+## 下载安装
 
-目前仅提供PHP版，请直接进入 php/ 目录进行下载。
+```
+    user$ git clone git://github.com/eixom/php-jsonlite.git
+    user$ cd php-jsonlite
+    user$ ~/your/php/bin/phpize
+    user$ ./configure --with-php-config=~/your/php/bin/php-config
+    user$ make
+    user$ make install
+```
 
-## 联系作者
+
+
+## 联系
 
 email: system128 at gmail dot com
 
