@@ -168,7 +168,7 @@ static zend_bool parse_const(jsonlite_decoder *self, const char *constent, const
     zend_bool pass = 1;
     char value[35] = {0};
     char ch = 0;
-    uint32_t i = 0;
+    int i = 0;
 
     begin(self);
 
