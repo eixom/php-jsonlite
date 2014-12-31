@@ -17,7 +17,7 @@ $traces = jsonlite_get_trace();
 assert($traces === array(
 		array('map.terminal', 3, 6,),
 		array('brackets.match', 3, 3, '}'),
-	), var_export($traces, true));
+	));
 
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
@@ -34,7 +34,7 @@ assert($traces === array(
 			'chars'  => ':v',
 			'detail' => '}'
 		)
-	), var_export($traces, true));
+	));
 
 $jsonlite = '[true';
 $result = jsonlite_decode($jsonlite);
@@ -43,7 +43,7 @@ assert($result === null);
 $traces = jsonlite_get_trace();
 assert($traces === array(
 		array('brackets.match', 1, 1, ']'),
-	), var_export($traces, true));
+	));
 
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
@@ -54,7 +54,7 @@ assert($traces === array(
 			'chars'  => '[t',
 			'detail' => ']'
 		)
-	), var_export($traces, true));
+	));
 
 $jsonlite = ']';
 $result = jsonlite_decode($jsonlite);
@@ -63,7 +63,7 @@ assert($result === null);
 $traces = jsonlite_get_trace();
 assert($traces === array(
 		array('parse.char', 0, 0),
-	), var_export($traces, true));
+	));
 
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
@@ -73,7 +73,7 @@ assert($traces === array(
 				array(0, 0),
 			'chars' => ']'
 		)
-	), var_export($traces, true));
+	));
 
 $jsonlite = '[,';
 $result = jsonlite_decode($jsonlite);
@@ -82,7 +82,7 @@ assert($result === null);
 $traces = jsonlite_get_trace();
 assert($traces === array(
 		array('brackets.match', 0, 0, ']'),
-	), var_export($traces, true));
+	));
 
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
@@ -93,7 +93,7 @@ assert($traces === array(
 			'chars'  => '[',
 			'detail' => ']'
 		)
-	), var_export($traces, true));
+	));
 
 
 $jsonlite = '[,';
@@ -103,7 +103,7 @@ assert($result === null);
 $traces = jsonlite_get_trace();
 assert($traces === array(
 		array('brackets.match', 0, 0, ']'),
-	), var_export($traces, true));
+	));
 
 $traces = jsonlite_get_trace(true);
 assert($traces === array(
@@ -114,7 +114,7 @@ assert($traces === array(
 			'chars'  => '[',
 			'detail' => ']'
 		)
-	), var_export($traces, true));
+	));
 
 
 echo '[success] error';

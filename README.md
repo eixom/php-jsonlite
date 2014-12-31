@@ -1,25 +1,26 @@
-## 介绍
+## introduce
 
-JSONLite 是 JSON 的简化版。减少字符输出的同时，仍保持数据有效性。
+JSONLite is a lite version of JSON.
 
-建议PHP版本 >= 5.2.0 。
+PHP 5.2 or later
 
 [![Build Status](https://secure.travis-ci.org/eixom/php-jsonlite.png)](http://travis-ci.org/eixom/php-jsonlite)
 
-## 特性
+## feature
 
-* Js 兼容模式，兼容Js语法。取消了不必要的双引号。
-* Strict 强类型模式，提供强类型输出与解析，可用于与强类型语言通讯。
-  * 如 1.0 序列化和解序列后的类型均为 double，不会转换为 int 1。
-* Min 最小化模式，最小化输出数据，可用于日志打印。
-* 较为精确的错误位置和信息提示。
-* 解析时更为显性的暴漏格式错误
+* encode 
+    * mode : js. Compatible with javascript 
+    * mode : strict. Keep the data type
+        * ex. 1.0 will be encode as "1.0"(without quote),and decode as 1.0 
+    * encode mode : min. reduce the data size, which is useful for logs.
+* decode : Compatible with JSON
+* better error position brief and description
+* make errors more explicit
 
 
-## 实例
+## examples
 
 ```php
-require_once 'jsonlite.php';
 $value = array(
 	'code'   => '123',
 	'msg'    => 'true str',
@@ -29,24 +30,22 @@ $value = array(
 );
 // serialize
 // js
-$encoder = new JSONLiteEncoder($value);
-echo $encoder->encode(), PHP_EOL;
-// {code:"123",msg:"true str","null":null,"new":"",double:1}
-
-// strict
-$encoder = new JSONLiteEncoder($value, JSONLiteEncoder::TYPE_STRICT);
-echo $encoder->encode(), PHP_EOL;
-// {code:"123",msg:true str,"null":null,new:,double:1.0}
+echo jsonlite_encode($value);
+// {code:123,msg:"true str","null":0,"new":"",double:1}
 
 // min
-$encoder = new JSONLiteEncoder($value, JSONLiteEncoder::TYPE_MIN);
-echo $encoder->encode(), PHP_EOL;
-// {code:123,msg:true str,"null":null,new:,double:1}
+echo jsonlite_encode($value, JSONLITE_MODE_MIN);
+// {code:123,msg:true str,"null":,new:,double:1}
+
+// strict
+echo jsonlite_encode($value, JSONLITE_MODE_STRICT);
+// {code:"123",msg:true str,"null":null,new:,double:1.0}
+
 
 // unserialize
 $jsonlite = '{code:123,msg:true str,"null":null,new:,double:1}';
-$encoder = new JSONLiteDecoder($jsonlite);
-var_export($encoder->decode());
+$value = jsonlite_decode($jsonlite);
+var_export($value);
 /**
  * array (
  *     'code' => 123,
@@ -56,16 +55,39 @@ var_export($encoder->decode());
  *     'double' => 1,
  * )
  */
-```
-### 尺寸比较
+ 
+// work with json
+$value = array(
+	'code'   => '123',
+	'msg'    => 'true str',
+	'null'   => null,
+	'new'    => '',
+	'double' => 1.0,
+);
+
+$json = json_encode($value); // ATTENTION:encode with json
+// {"code":"123","msg":"true str","null":null,"new":"","double":1}
+$value = jsonlite_decode($json);
+var_export($value);
+/**
+  * array (
+  *     'code' => 123,
+  *     'msg' => 'true str',
+  *     'null' => NULL,
+  *     'new' => '',
+  *     'double' => 1,
+  * )
+  */
+
+### size
 
 <table>
     <tr>
-        <td>模式</td>
+        <td>mode</td>
         <td>json</td>
         <td>jsonlite</td>
-        <td>节约</td>
-        <td>变化率</td>
+        <td>saving</td>
+        <td>rate</td>
     </tr>
     <tr><td>array_js</td><td>92</td><td>92</td><td>0</td><td> 0.00%</td></tr>
     <tr><td>array_strict</td><td>92</td><td>74</td><td>-18</td><td>19.57%</td></tr>
@@ -75,13 +97,13 @@ var_export($encoder->decode());
     <tr><td>map_min</td><td>111</td><td>81</td><td>-30</td><td>27.03%</td></tr>
 </table>
 
-## 版本
+## version
 
-* 最后更新：2014-12-25
-* 最新版本： 0.2
+* latest update: 2014-12-25
+* latest version: 0.2
 
     
-## 下载安装
+## install
 
 ```
     user$ git clone git://github.com/eixom/php-jsonlite.git
@@ -92,10 +114,6 @@ var_export($encoder->decode());
     user$ make install
 ```
 
+## contact
 
-
-## 联系
-
-email: system128 at gmail dot com
-
-qq: 59.43.59.0
+email: system128/at/gmail/dot/com

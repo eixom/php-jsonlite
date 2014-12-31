@@ -22,9 +22,9 @@
 #include "ext/standard/php_smart_str.h"
 
 
-#define JSONLITE_TYPE_MIN 1
-#define JSONLITE_TYPE_JS 2
-#define JSONLITE_TYPE_STRICT 3
+#define JSONLITE_MODE_MIN 1
+#define JSONLITE_MODE_JS 2
+#define JSONLITE_MODE_STRICT 3
 
 typedef struct {
     zend_uchar type;

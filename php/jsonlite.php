@@ -45,17 +45,17 @@ class JSONLiteEncoder {
 	/**
 	 * minimum
 	 */
-	const  TYPE_MIN = 1;
+	const  MODE_MIN = 1;
 
 	/**
 	 * work with js
 	 */
-	const  TYPE_JS = 2;
+	const  MODE_JS = 2;
 
 	/**
 	 * strong type
 	 */
-	const  TYPE_STRICT = 3;
+	const  MODE_STRICT = 3;
 
 	const DEPTH_MAX = 512;
 
@@ -79,7 +79,7 @@ class JSONLiteEncoder {
 	 * @param mixed $value data
 	 * @param int $type work with log/js/strong type
 	 */
-	function __construct($value, $type = self::TYPE_JS) {
+	function __construct($value, $type = self::MODE_JS) {
 		$this->value = $value;
 		$this->json = null;
 		$this->type = $type;
@@ -99,13 +99,13 @@ class JSONLiteEncoder {
 	 */
 	private function  appendNull() {
 		switch ($this->type) {
-			case self::TYPE_MIN:
+			case self::MODE_MIN:
 				$this->json .= '';
 				break;
-			case self::TYPE_JS:
+			case self::MODE_JS:
 				$this->json .= '0';
 				break;
-			case self::TYPE_STRICT:
+			case self::MODE_STRICT:
 			default:
 				$this->json .= 'null';
 		}
@@ -119,13 +119,13 @@ class JSONLiteEncoder {
 	private function  appendBool($value) {
 
 		switch ($this->type) {
-			case self::TYPE_MIN:
+			case self::MODE_MIN:
 				$this->json .= $value ? '1' : '';
 				break;
-			case self::TYPE_JS:
+			case self::MODE_JS:
 				$this->json .= $value ? '1' : '0';
 				break;
-			case self::TYPE_STRICT:
+			case self::MODE_STRICT:
 			default:
 				$this->json .= $value ? 'true' : 'false';
 		}
@@ -148,7 +148,7 @@ class JSONLiteEncoder {
 	 */
 	private function  appendFloat($value) {
 		$value = sprintf('%0.9g', $value);
-		if ($this->type === self::TYPE_STRICT) {
+		if ($this->type === self::MODE_STRICT) {
 			if (!is_float($value + 0)) {
 				$value .= '.0';
 			}
@@ -206,11 +206,11 @@ class JSONLiteEncoder {
 		}
 
 		if ($i === 1) {
-			if ($this->type !== self::TYPE_JS && $value === '') {
+			if ($this->type !== self::MODE_JS && $value === '') {
 				$this->json .= '""';
 			}
 
-			if ($this->type === self::TYPE_MIN && $value === null) {
+			if ($this->type === self::MODE_MIN && $value === null) {
 				$this->json .= '""';
 			}
 		}
@@ -345,7 +345,7 @@ class JSONLiteEncoder {
 				break;
 			}
 
-			if ($this->type === self::TYPE_JS) {
+			if ($this->type === self::MODE_JS) {
 				if ($this->isKeyword($str)) {
 					$isQuote = true;
 					break;
@@ -386,7 +386,7 @@ class JSONLiteEncoder {
 
 			}
 
-			if ($this->type === self::TYPE_STRICT) {
+			if ($this->type === self::MODE_STRICT) {
 				if (!$isMapKey) {
 					/**
 					 * 0 "0"
@@ -1149,15 +1149,15 @@ define('JSONLITE_TRACE_G', '__jsonlite_trace_g');
 /**
  * work with log
  */
-define('JSONLITE_TYPE_MIN', JsonliteEncoder::TYPE_MIN);
+define('JSONLITE_MODE_MIN', JsonliteEncoder::MODE_MIN);
 /**
  * work with js
  */
-define('JSONLITE_TYPE_JS', JsonliteEncoder::TYPE_JS);
+define('JSONLITE_MODE_JS', JsonliteEncoder::MODE_JS);
 /**
  * work with strong type program language
  */
-define('JSONLITE_TYPE_STRICT', JsonliteEncoder::TYPE_STRICT);
+define('JSONLITE_MODE_STRICT', JsonliteEncoder::MODE_STRICT);
 /**
  * get the JSONLite representation of a value
  *
@@ -1165,7 +1165,7 @@ define('JSONLITE_TYPE_STRICT', JsonliteEncoder::TYPE_STRICT);
  * @param int $type
  * @return string
  */
-function jsonlite_encode($value, $type = JSONLITE_TYPE_JS, $castAsMap = false) {
+function jsonlite_encode($value, $type = JSONLITE_MODE_JS, $castAsMap = false) {
 	$encoder = new JSONLiteEncoder($value, $type);
 	$encoder->setCastAsMap($castAsMap);
 

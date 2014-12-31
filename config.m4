@@ -15,7 +15,7 @@ AC_DEFUN([PHP_JSONLITE_ADD_SOURCE], [
     PHP_JSONLITE_ADD_SOURCE([jsonlite_encode.c])
     PHP_JSONLITE_ADD_SOURCE([jsonlite_decode.c])
 
-    PHP_NEW_EXTENSION(jsonlite, $PHP_JSONLITE_SOURCES,$ext_shared)
+    PHP_NEW_EXTENSION(jsonlite, $PHP_JSONLITE_SOURCES, $ext_shared)
 
 dnl    ifdef([PHP_ADD_EXTENDION_DEP],
 dnl    [

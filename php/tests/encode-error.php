@@ -8,7 +8,7 @@ require_once dirname(__FILE__) . '/helper.php';
 
 $error_count = 0;
 function __error_handler($code, $msg, $file, $line) {
-	assert($msg === 'circular.references');
+	assert($msg === 'may.recursion');
 	global $error_count;
 	$error_count++;
 }

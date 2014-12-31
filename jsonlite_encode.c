@@ -29,12 +29,12 @@ static void append(jsonlite_encoder *self, smart_str *buffer, zval *val TSRMLS_D
 
 static void append_null(jsonlite_encoder *self, smart_str *buffer) {
     switch (self->type) {
-        case JSONLITE_TYPE_MIN:
+        case JSONLITE_MODE_MIN:
             break;
-        case JSONLITE_TYPE_JS:
+        case JSONLITE_MODE_JS:
             smart_str_appendl(buffer, "0", 1);
             break;
-        case JSONLITE_TYPE_STRICT:
+        case JSONLITE_MODE_STRICT:
         default:
             smart_str_appendl(buffer, "null", 4);
 
@@ -43,19 +43,19 @@ static void append_null(jsonlite_encoder *self, smart_str *buffer) {
 
 static void append_bool(jsonlite_encoder *self, smart_str *buffer, zend_bool val) {
     switch (self->type) {
-        case JSONLITE_TYPE_MIN:
+        case JSONLITE_MODE_MIN:
             if (val) {
                 smart_str_appendc(buffer, '1');
             }
             break;
-        case JSONLITE_TYPE_JS:
+        case JSONLITE_MODE_JS:
             if (val) {
                 smart_str_appendc(buffer, '1');
             } else {
                 smart_str_appendc(buffer, '0');
             }
             break;
-        case JSONLITE_TYPE_STRICT:
+        case JSONLITE_MODE_STRICT:
         default:
             if (val) {
                 smart_str_appendl(buffer, "true", 4);
@@ -79,7 +79,7 @@ static void append_double(jsonlite_encoder *self, smart_str *buffer, double val 
         len = spprintf(&str, 0, "%.*G", (int) EG(precision), val);
         smart_str_appendl(buffer, str, len);
 
-        if (self->type == JSONLITE_TYPE_STRICT) {
+        if (self->type == JSONLITE_MODE_STRICT) {
             if (strchr(str, '.') == NULL) {
                 smart_str_appendl(buffer, ".0", 2);
             }
@@ -173,12 +173,12 @@ static void append_array(jsonlite_encoder *self, smart_str *buffer, HashTable *a
     }
 
     if (i == 1) {
-        if (self->type != JSONLITE_TYPE_JS
+        if (self->type != JSONLITE_MODE_JS
                 && Z_TYPE_PP(value) == IS_STRING && Z_STRLEN_PP(value) == 0) {
             smart_str_appendl(buffer, "\"\"", 2);
         }
 
-        if (self->type == JSONLITE_TYPE_MIN
+        if (self->type == JSONLITE_MODE_MIN
                 && Z_TYPE_PP(value) == IS_NULL) {
             smart_str_appendl(buffer, "\"\"", 2);
         }
@@ -217,10 +217,6 @@ static void append_map(jsonlite_encoder *self, smart_str *buffer, HashTable *arr
         if (key_type != HASH_KEY_NON_EXISTANT) {
             if (zend_hash_get_current_data_ex(array, (void **) &value, &pointer) == SUCCESS) {
                 self->depth++;
-
-#if PHP_DEBUG
-//                php_printf("key_type:%d, key_size:%u\n", key_type, key_size);
-#endif
 
                 if (key_type == HASH_KEY_IS_STRING) {
                     append_string(self, buffer, key, key_size - 1, 1 TSRMLS_CC);
@@ -347,7 +343,7 @@ static zend_bool is_quote(jsonlite_encoder *self, smart_str *buffer, char *str, 
             break;
         }
 
-        if (self->type == JSONLITE_TYPE_JS) {
+        if (self->type == JSONLITE_MODE_JS) {
             if (is_keyword(str, len)) {
                 quote = 1;
                 break;
@@ -388,7 +384,7 @@ static zend_bool is_quote(jsonlite_encoder *self, smart_str *buffer, char *str, 
 
         }
 
-        if (self->type == JSONLITE_TYPE_STRICT) {
+        if (self->type == JSONLITE_MODE_STRICT) {
             if (!is_map_key) {
                 /**
                 * 0 "0"
@@ -528,7 +524,7 @@ void php_jsonlite_encode(jsonlite_encoder *encoder, smart_str *jsonlite, zval *v
 PHP_FUNCTION (jsonlite_encode) {
     zval *value = NULL;
     jsonlite_encoder self = {/*type*/0, /*cast_as_map*/0, /*depth*/0};
-    uint encode_type = 0;
+    uint encode_type = JSONLITE_MODE_JS;
     zend_bool cast_as_map = 0;
     smart_str jsonlite = {NULL, 0, 0};
     char *str = NULL;

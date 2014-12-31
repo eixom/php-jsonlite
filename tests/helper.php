@@ -42,15 +42,15 @@ function show_decode_error($msg, $expected, $actual) {
 }
 
 function assert_encode_result($value, $expected_min, $expected_js, $expected_strict, $cast = false) {
-	$actual = jsonlite_encode($value, JSONLITE_TYPE_MIN, $cast);
+	$actual = jsonlite_encode($value, JSONLITE_MODE_MIN, $cast);
 	if ($actual !== $expected_min) {
 		show_encode_error('min', $expected_min, $actual);
 	}
-	$actual = jsonlite_encode($value, JSONLITE_TYPE_JS, $cast);
+	$actual = jsonlite_encode($value, JSONLITE_MODE_JS, $cast);
 	if ($actual !== $expected_js) {
 		show_encode_error('js', $expected_js, $actual);
 	}
-	$actual = jsonlite_encode($value, JSONLITE_TYPE_STRICT, $cast);
+	$actual = jsonlite_encode($value, JSONLITE_MODE_STRICT, $cast);
 	if ($actual !== $expected_strict) {
 		show_encode_error('strict', $expected_js, $actual);
 	}
@@ -60,7 +60,7 @@ function assert_decode_result($value, $expected_min, $expected_js, $expected_str
 	/**
 	 * min
 	 */
-	$jsonlite = jsonlite_encode($value, JSONLITE_TYPE_MIN);
+	$jsonlite = jsonlite_encode($value, JSONLITE_MODE_MIN);
 	$result = jsonlite_decode($jsonlite);
 	$traces = jsonlite_get_trace();
 
@@ -73,7 +73,7 @@ function assert_decode_result($value, $expected_min, $expected_js, $expected_str
 	/**
 	 * js
 	 */
-	$jsonlite = jsonlite_encode($value, JSONLITE_TYPE_JS);
+	$jsonlite = jsonlite_encode($value, JSONLITE_MODE_JS);
 	$result = jsonlite_decode($jsonlite);
 	$traces = jsonlite_get_trace();
 
@@ -87,7 +87,7 @@ function assert_decode_result($value, $expected_min, $expected_js, $expected_str
 	/**
 	 * strict
 	 */
-	$jsonlite = jsonlite_encode($value, JSONLITE_TYPE_STRICT);
+	$jsonlite = jsonlite_encode($value, JSONLITE_MODE_STRICT);
 	$result = jsonlite_decode($jsonlite);
 	$traces = jsonlite_get_trace();
 
