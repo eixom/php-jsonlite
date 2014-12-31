@@ -1,4 +1,3 @@
-## introduce
 
 JSONLite is a lite version of JSON.
 
@@ -12,10 +11,10 @@ PHP 5.2 or later
     * mode : js. Compatible with javascript 
     * mode : strict. Keep the data type
         * ex. 1.0 will be encode as "1.0"(without quote),and decode as 1.0 
-    * encode mode : min. reduce the data size, which is useful for logs.
+    * encode mode : min. Reduce the data size, which is useful for logs.
 * decode : Compatible with JSON
-* better error position brief and description
-* make errors more explicit
+* Better error position brief and description
+* Make errors more explicit
 
 
 ## examples
