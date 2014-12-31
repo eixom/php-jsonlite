@@ -78,6 +78,7 @@ var_export($value);
   *     'double' => 1,
   * )
   */
+```
 
 ### size
 
