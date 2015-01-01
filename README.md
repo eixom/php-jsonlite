@@ -130,7 +130,7 @@ var_export($value);
 <img src="https://raw.githubusercontent.com/eixom/php-jsonlite/master/diagram/number.png" />
 
 ### string
-<img src="https://raw.githubusercontent.com/eixom/php-jsonlite/master/diagram/string.png" width="600"/>
+<img src="https://raw.githubusercontent.com/eixom/php-jsonlite/master/diagram/string.png" />
 
 
 
