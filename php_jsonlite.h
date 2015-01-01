@@ -41,17 +41,23 @@ extern zend_module_entry jsonlite_module_entry;
 
 #ifndef PHP_FE_END
 #define PHP_FE_END {NULL, NULL, NULL}
-#endif PHP_FE_END
-
-#ifdef ZTS
-#include "TSRM.h"
 #endif
 
-PHP_MINIT_FUNCTION(jsonlite);
-PHP_MSHUTDOWN_FUNCTION(jsonlite);
-PHP_RINIT_FUNCTION(jsonlite);
-PHP_RSHUTDOWN_FUNCTION(jsonlite);
-PHP_MINFO_FUNCTION(jsonlite);
+#ifdef ZTS
+
+#include "TSRM.h"
+
+#endif
+
+PHP_MINIT_FUNCTION (jsonlite);
+
+PHP_MSHUTDOWN_FUNCTION (jsonlite);
+
+PHP_RINIT_FUNCTION (jsonlite);
+
+PHP_RSHUTDOWN_FUNCTION (jsonlite);
+
+PHP_MINFO_FUNCTION (jsonlite);
 
 
 ZEND_BEGIN_MODULE_GLOBALS(jsonlite)

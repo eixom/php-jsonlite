@@ -357,11 +357,6 @@ class JSONLiteEncoder {
 						break;
 					}
 
-					if (strpos($str, ':') !== false) {
-						$isQuote = true;
-						break;
-					}
-
 					if (!$this->isKey($str) && !is_numeric($str)) {
 						$isQuote = true;
 						break;

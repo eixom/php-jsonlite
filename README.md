@@ -79,6 +79,24 @@ var_export($value);
   */
 ```
 
+
+## version
+
+* latest update: 2014-12-25
+* latest version: 0.2
+
+    
+## install
+
+```
+    user$ git clone git://github.com/eixom/php-jsonlite.git
+    user$ cd php-jsonlite
+    user$ ~/your/php/bin/phpize
+    user$ ./configure --with-php-config=~/your/php/bin/php-config
+    user$ make
+    user$ make install
+```
+
 ### size
 
 <table>
@@ -97,22 +115,24 @@ var_export($value);
     <tr><td>map_min</td><td>111</td><td>81</td><td>-30</td><td>27.03%</td></tr>
 </table>
 
-## version
+## forms
 
-* latest update: 2014-12-25
-* latest version: 0.2
+### map/object
+<img src="https://raw.githubusercontent.com/eixom/php-jsonlite/master/diagram/map_or_object.png" />
 
-    
-## install
+### array
+<img src="https://raw.githubusercontent.com/eixom/php-jsonlite/master/diagram/array.png" />
 
-```
-    user$ git clone git://github.com/eixom/php-jsonlite.git
-    user$ cd php-jsonlite
-    user$ ~/your/php/bin/phpize
-    user$ ./configure --with-php-config=~/your/php/bin/php-config
-    user$ make
-    user$ make install
-```
+### value
+<img src="https://raw.githubusercontent.com/eixom/php-jsonlite/master/diagram/value.png" />
+
+### number
+<img src="https://raw.githubusercontent.com/eixom/php-jsonlite/master/diagram/number.png" />
+
+### string
+<img src="https://raw.githubusercontent.com/eixom/php-jsonlite/master/diagram/string.png" width="600"/>
+
+
 
 ## contact
 

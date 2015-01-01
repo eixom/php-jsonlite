@@ -355,11 +355,6 @@ static zend_bool is_quote(jsonlite_encoder *self, smart_str *buffer, char *str, 
                     break;
                 }
 
-                if (strchr(str, ':') != NULL) {
-                    quote = 1;
-                    break;
-                }
-
                 if (!is_key(str, len) && is_numeric_string(str, len, NULL, NULL, 0) <= 0) {
                     quote = 1;
                     break;
